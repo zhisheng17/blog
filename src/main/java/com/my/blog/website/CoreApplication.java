@@ -24,6 +24,7 @@ public class CoreApplication extends SpringBootServletInitializer
 {
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+
         return builder.sources(this.getClass());
     }
 
