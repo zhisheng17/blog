@@ -10,7 +10,7 @@ import com.my.blog.website.modal.Bo.BackResponseBo;
 import com.my.blog.website.modal.Bo.RestResponseBo;
 import com.my.blog.website.modal.Vo.OptionVo;
 import com.my.blog.website.service.IOptionService;
-import com.my.blog.website.utils.GsonUtils;
+import com.my.blog.website.utils.JacksonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +76,7 @@ public class SettingController extends BaseController {
             if (StringUtils.isNotBlank(site_theme)) {
                 BaseController.THEME = "themes/" + site_theme;
             }
-            logService.insertLog(LogActions.SYS_SETTING.getAction(), GsonUtils.toJsonString(querys), request.getRemoteAddr(), this.getUid(request));
+            logService.insertLog(LogActions.SYS_SETTING.getAction(), JacksonUtils.toJsonString(querys), request.getRemoteAddr(), this.getUid(request));
             return RestResponseBo.ok();
         } catch (Exception e) {
             String msg = "保存设置失败";
