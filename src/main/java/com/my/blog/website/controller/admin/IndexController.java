@@ -1,6 +1,23 @@
 package com.my.blog.website.controller.admin;
 
-import com.my.blog.website.service.ISiteService;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.my.blog.website.constant.WebConst;
 import com.my.blog.website.controller.BaseController;
 import com.my.blog.website.dto.LogActions;
@@ -12,20 +29,10 @@ import com.my.blog.website.modal.Vo.ContentVo;
 import com.my.blog.website.modal.Vo.LogVo;
 import com.my.blog.website.modal.Vo.UserVo;
 import com.my.blog.website.service.ILogService;
+import com.my.blog.website.service.ISiteService;
 import com.my.blog.website.service.IUserService;
-import com.my.blog.website.utils.GsonUtils;
+import com.my.blog.website.utils.JacksonUtils;
 import com.my.blog.website.utils.TaleUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.List;
 
 /**
  * 后台管理首页
@@ -95,21 +102,27 @@ public class IndexController extends BaseController {
     public RestResponseBo saveProfile(@RequestParam String screenName, @RequestParam String email, HttpServletRequest request, HttpSession session) {
 
         UserVo users = this.user(request);
-        if (StringUtils.isNotBlank(screenName) && StringUtils.isNotBlank(email)) {
-            UserVo temp = new UserVo();
-            temp.setUid(users.getUid());
-            temp.setScreenName(screenName);
-            temp.setEmail(email);
-            userService.updateByUid(temp);
-            logService.insertLog(LogActions.UP_INFO.getAction(), GsonUtils.toJsonString(temp), request.getRemoteAddr(), this.getUid(request));
-
-            //更新session中的数据
-            UserVo original = (UserVo) session.getAttribute(WebConst.LOGIN_SESSION_KEY);
-            original.setScreenName(screenName);
-            original.setEmail(email);
-            session.setAttribute(WebConst.LOGIN_SESSION_KEY, original);
+        try {
+        	if (StringUtils.isNotBlank(screenName) && StringUtils.isNotBlank(email)) {
+                UserVo temp = new UserVo();
+                temp.setUid(users.getUid());
+                temp.setScreenName(screenName);
+                temp.setEmail(email);
+                userService.updateByUid(temp);
+    			logService.insertLog(LogActions.UP_INFO.getAction(), JacksonUtils.toJsonString(temp), request.getRemoteAddr(), this.getUid(request));
+                //更新session中的数据
+                UserVo original = (UserVo) session.getAttribute(WebConst.LOGIN_SESSION_KEY);
+                original.setScreenName(screenName);
+                original.setEmail(email);
+                session.setAttribute(WebConst.LOGIN_SESSION_KEY, original);
+            }
+            return RestResponseBo.ok();
+		} catch (JsonProcessingException e) {
+			String msg = "数据格式错误";
+			LOGGER.error(msg, e);
+			return RestResponseBo.fail(msg);
         }
-        return RestResponseBo.ok();
+        
     }
 
     /**
