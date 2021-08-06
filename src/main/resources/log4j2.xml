@@ -8,7 +8,7 @@
     <properties>
         <!--<property name="LOG_HOME">/opt/logs/api-logs/</property>-->
         <property name="LOG_HOME">./logs</property>
-        <property name="FORMAT">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</property>
+        <property name="FORMAT">%highlight{%d{HH:mm:ss.SSS} %-5level %logger{36}.%M() @%L - %msg%n}{FATAL=Bright Red, ERROR=Bright Magenta, WARN=Bright Yellow, INFO=Bright Green, DEBUG=Bright Cyan, TRACE=Bright White}</property>
     </properties>
 
     <!-- appender用于接收各种日志 -->
